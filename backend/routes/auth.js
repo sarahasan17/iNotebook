@@ -4,7 +4,7 @@ var bcrypt = require("bcryptjs");
 const { body, validationResult } = require("express-validator");
 const router = express.Router();
 var jwt = require("jsonwebtoken");
-const SECRET_TOKEN='saraisagoodgirl';
+const SECRET_TOKEN = "saraisagoodgirl";
 const fetchUser = require("../middleware/FetchUser");
 //create a user
 router.post(
@@ -20,35 +20,34 @@ router.post(
     if (!result.isEmpty()) {
       return res.status(400).json({ result: result.array() });
     }
-     let user = await User.findOne({ email: req.body.email });
-     if (user) {
-       return res.status(400).json({ error: "Email already exists" });
-     }
-    try{
-      const salt=await bcrypt.genSalt(10);
-      const secPass=await bcrypt.hash(req.body.password,salt)
-      user=await User.create({
-      name: req.body.name,
-      password: secPass,
-      email: req.body.email,
-    })
-    const data={
-      user:{
-        id:user.id
-      }
+    let user = await User.findOne({ email: req.body.email });
+    if (user) {
+      return res.status(400).json({ error: "Email already exists" });
     }
-    const authtoken=jwt.sign(data,SECRET_TOKEN)
-    res.json({authtoken})
-    }
-    catch(error){
-      console.error(error.message)
-      res.status(500).json("Bad request found")
-
+    try {
+      const salt = await bcrypt.genSalt(10);
+      const secPass = await bcrypt.hash(req.body.password, salt);
+      user = await User.create({
+        name: req.body.name,
+        password: secPass,
+        email: req.body.email,
+      });
+      const data = {
+        user: {
+          id: user.id,
+        },
+      };
+      const authtoken = jwt.sign(data, SECRET_TOKEN);
+      res.json({ authtoken });
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).json("Bad request found");
     }
   }
 );
 //login user
-router.post('/userLogin',
+router.post(
+  "/userLogin",
   [
     body("email", "Enter a valid email").isEmail(),
     body("password", "Password cannot be blank").exists(),
@@ -60,9 +59,9 @@ router.post('/userLogin',
       if (!result.isEmpty()) {
         return res.status(400).json({ result: result.array() });
       }
-      
+
       const { email, password } = req.body;
-      let user = await User.findOne({email});
+      let user = await User.findOne({ email });
       if (!user) {
         return res
           .status(500)
@@ -86,11 +85,11 @@ router.post('/userLogin',
       res.status(500).json("Bad request found");
     }
   }
-)
+);
 //get user
-router.post('/getUser',fetchUser, async (req,res)=>{
- // res.json({ amma: "amma" });
-  try{
+router.post("/getUser", fetchUser, async (req, res) => {
+  // res.json({ amma: "amma" });
+  try {
     const userId = req.user.id;
     // Debug: Log userId and its type
     console.log("userId:", userId);
@@ -101,9 +100,9 @@ router.post('/getUser',fetchUser, async (req,res)=>{
     } else {
       res.status(401).json("User not found");
     }
-  }catch(error){
-    console.error(error.message)
+  } catch (error) {
+    console.error(error.message);
     res.status(500).json("Bad request found");
   }
-})
-module.exports = router
+});
+module.exports = router;
