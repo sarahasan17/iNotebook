@@ -2,43 +2,51 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import noteContext from "../context/notes/notesContext";
 import NoteItem from "./NoteItem";
 import AddNote from "./AddNote";
+import { useNavigate } from "react-router-dom";
 
-function Notes() {
-      const noteval = useContext(noteContext);
-      const { notes, getNotes,editNote } = noteval;
-      const [note, setNotes] = useState({
-        id:"",
-        title: "",
-        description: "",
-        tag: "",
-      });
-      useEffect(()=>{
-        getNotes()
-      },[])
-      const updateNote = (currentNote) => {
-         ref.current.click();
-         setNotes({
-           id: currentNote._id, // Set the correct id here
-           title: currentNote.title,
-           description: currentNote.description,
-           tag: currentNote.tag,
-         });
-      };
-      const ref=useRef(null)
-      const refclose = useRef(null);
+function Notes(props) {
+  let navigate = useNavigate();
+  const noteval = useContext(noteContext);
+  const { notes, getNotes, editNote } = noteval;
+  const { showAlert } = props;
+  const [note, setNotes] = useState({
+    id: "",
+    title: "",
+    description: "",
+    tag: "",
+  });
+  useEffect(() => {
+    if (localStorage.getItem("token")!==null) {
+      getNotes();
+    } else {
+      navigate("/login");
+    }
+  }, []);
+  const updateNote = (currentNote) => {
+    ref.current.click();
+    setNotes({
+      id: currentNote._id, // Set the correct id here
+      title: currentNote.title,
+      description: currentNote.description,
+      tag: currentNote.tag,
+    });
+    props.showAlert("notes updated successfully", "success");
+  };
+  const ref = useRef(null);
+  const refclose = useRef(null);
 
-       const handleClick = (e) => {
-         e.preventDefault();
-         editNote(note.id, note.title, note.description, note.tag); // Ensure id is passed here
-         refclose.current.click(); // Close modal after editing
-       };
+  const handleClick = (e) => {
+    e.preventDefault();
+    editNote(note.id, note.title, note.description, note.tag); // Ensure id is passed here
+    refclose.current.click(); // Close modal after editing
+  };
 
-       const onChange = (e) => {
-         setNotes({ ...note, [e.target.name]: e.target.value });
-       };
+  const onChange = (e) => {
+    setNotes({ ...note, [e.target.name]: e.target.value });
+  };
   return (
     <>
-      <AddNote />
+      <AddNote showAlert={showAlert} />
       <button
         ref={ref}
         type="button"
@@ -122,13 +130,18 @@ function Notes() {
       </div>
       <div className="row md-3">
         <h2>Your notes</h2>
-          {notes.length === 0 && "No notes available"}
+        {notes.length === 0 && "No notes available"}
         {notes.map((note) => (
-          <NoteItem key={note._id} note={note} updateNote={updateNote} />
+          <NoteItem
+            key={note._id}
+            note={note}
+            updateNote={updateNote}
+            showAlert={props.showAlert}
+          />
         ))}
       </div>
     </>
   );
 }
 
-export default Notes
+export default Notes;

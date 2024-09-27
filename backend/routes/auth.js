@@ -18,12 +18,10 @@ router.post(
     //res.json({amma:"amma"})
     const result = validationResult(req);
     if (!result.isEmpty()) {
-      let success=false;
       return res.status(400).json({ success:false,result: result.array() });
     }
     let user = await User.findOne({ email: req.body.email });
     if (user) {
-      let success=false;
       return res.status(400).json({ success:false,error: "Email already exists" });
     }
     try {
