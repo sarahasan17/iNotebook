@@ -9,9 +9,9 @@ function AddNote() {
       description: "",
       tag: "default",
     });
-    const handleClick=(e)=>{
+    const handleClick=async(e)=>{
         e.preventDefault();
-        addNote(note.title,note.description,note.tag);
+        await addNote(note.title,note.description,note.tag);
     };
     const onChange = (e) => {
         setNotes({...note,[e.target.name]:e.target.value})
@@ -27,6 +27,7 @@ function AddNote() {
             className="form-control"
             id="title"
             name="title"
+            value={note.title}
             onChange={onChange}
           />
         </div>
@@ -37,6 +38,7 @@ function AddNote() {
             className="form-control"
             id="description"
             name="description"
+            value={note.description}
             onChange={onChange}
           />
         </div>
@@ -49,6 +51,7 @@ function AddNote() {
             className="form-control"
             id="tag"
             name="tag"
+            value={note.tag}
             onChange={onChange}
           />
         </div>
